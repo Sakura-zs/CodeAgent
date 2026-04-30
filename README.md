@@ -1,2 +1,24 @@
-# CodeAgent
-This is an agent that uses a large model to automatically train the model, and can realize its own supervision of the training situation and give a feasible plan.
+# 🤖 AutoTrain-Agent：基于大模型的机器学习训练监工
+
+> 一个轻量级、聪明的 LLM Agent，专为深度学习炼丹师打造。它能帮你自动执行训练命令、监控终端日志，并在发现异常（如 Loss 爆炸、OOM）时智能终止任务并无缝切换到下一组参数。
+
+告别傻瓜式的 Bash 脚本，告别半夜起来看 Loss 曲线的痛苦！双手离开键盘，把炼丹的脏活累活交给 AI 监工。
+
+## ✨ 核心特性
+
+- 🧠 **真正理解日志**：接入大模型（OpenAI/Claude/DeepSeek等），不仅能看懂正常的 Epoch/Loss，还能识别出潜在的异常收敛。
+- 🛑 **智能早停 (Smart Kill)**：当检测到 `Loss: NaN`、`CUDA Out of Memory` 或严重报错卡死时，果断 Kill 掉当前进程，不浪费昂贵的 GPU 算力。
+- 🔄 **无人值守参数搜索**：按顺序自动执行命令队列，无论上一个任务是成功还是崩溃，都能平滑过渡到下一个任务。
+- 💸 **极低 Token 消耗**：采用“异步轮询 + 尾部日志截取”架构，每隔 N 分钟只看最后 50 行日志，避免长下文撑爆 Context Window。
+
+## 📂 文件结构
+
+- `agent.py`：Agent 的大脑与主控程序（包工头）。负责拉起进程、轮询日志、请求 LLM 并做出执行决策。
+- `mock_train.py`：一个模拟的训练脚本（打工人）。用于本地快速测试 Agent 是否能敏锐地抓取到模拟的 `NaN` 异常。
+
+## 🚀 快速开始
+
+### 1. 环境准备
+确保你的环境已安装 Python 3.8+，并安装 OpenAI SDK：
+```bash
+pip install openai
